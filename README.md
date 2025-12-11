@@ -1,5 +1,13 @@
+
+[![Ciencia de Datos](https://img.shields.io/badge/Ciencia%20de%20Datos-Big%20Data-brightgreen)]()
+[![Python](https://img.shields.io/badge/Python-%203.8%2B-blue)]()
+[![Big%20Data](https://img.shields.io/badge/Big%20Data-Tecnolog%C3%ADas%20Emergentes-orange)]()
+[![GitHub](https://img.shields.io/badge/GitHub-Gest%C3%B3n%20de%20proyectos-lightgrey)]()
+[![TecMM](https://img.shields.io/badge/TecMM-zapopan-0D3692?style=for-the-badge&logo=university&logoColor=white&labelColor=101010)]()
+## Descripción
+
 # parking-etl-tsj
-Este Proyecto busca que el alumno desarrolle competencias integrales en Data Engineering mediante la implementación de un pipeline ETL (Extract, Transform, Load) completo que procesa datos reales de acceso al estacionamiento de una institución educativa.  El estudiante actuará como Ingeniero de Datos responsable de:  Diseñar y construir un sistema de orquestación de datos automatizado  Aplicar principios de arquitectura medallion (bronce-plata-oro) para calidad de datos  Implementar transformaciones de datos con validación y limpieza  Generar modelos analíticos para toma de decisiones  Esta aproximación basada en proyectos reales prepara al estudiante para desafíos encontrados en la industria moderna de Data Science y Big Data.
+>Este Proyecto busca que el alumno desarrolle competencias integrales en Data Engineering mediante la implementación de un pipeline ETL (Extract, Transform, Load) completo que procesa datos reales de acceso al estacionamiento de una institución educativa.  El estudiante actuará como Ingeniero de Datos responsable de:  Diseñar y construir un sistema de orquestación de datos automatizado  Aplicar principios de arquitectura medallion (bronce-plata-oro) para calidad de datos  Implementar transformaciones de datos con validación y limpieza  Generar modelos analíticos para toma de decisiones  Esta aproximación basada en proyectos reales prepara al estudiante para desafíos encontrados en la industria moderna de Data Science y Big Data.
 
 ## Guía Rápida 
 
@@ -11,12 +19,12 @@ Esta solución completa de Data Engineering que implementa la arquitectura medal
 
 ##  Características
 
-- ✅ **Pipeline ETL completo** orquestado con Apache Airflow
-- ✅ **Arquitectura medallion** (bronce raw → plata staging → oro confiable)
-- ✅ **92,572 registros** de accesos de estacionamiento (2021-2025)
-- ✅ **Transformaciones automáticas** de limpieza y validación
-- ✅ **Análisis de ocupación** por hora, día y tipo de vehículo
-- ✅ **Entorno local con Docker** listo para desarrollo
+- **Pipeline ETL completo** orquestado con Apache Airflow
+- **Arquitectura medallion** (bronce raw → plata staging → oro confiable)
+- **92,572 registros** de accesos de estacionamiento (2021-2025)
+- **Transformaciones automáticas** de limpieza y validación
+- **Análisis de ocupación** por hora, día y tipo de vehículo
+- **Entorno local con Docker** listo para desarrollo
 
 ##  Requisitos Previos
 
@@ -160,7 +168,7 @@ FROM oro_resumen_tipo_vehiculo
 ORDER BY total_accesos DESC;
 ```
 
-## 🔧 Comandos Útiles
+## Comandos Útiles
 
 ### Ver estado de servicios
 ```bash
@@ -228,7 +236,7 @@ ls -lh data/
 # Ejecutar DAG manualmente
 ```
 
-## 📊 Dataset
+## Dataset
 
 **Reporte de Acceso - TSJ Zapopan**
 - **Período:** 2021-2025
@@ -247,26 +255,26 @@ ls -lh data/
   - vacacional (BOOLEAN)
   - año (INT)
 
-## 🎓 Aprendizajes Esperados
+##  Aprendizajes Esperados
 
-✅ Levantar entorno Docker con múltiples servicios
-✅ Diseñar DAGs en Apache Airflow
-✅ Implementar ETL con Python y pandas
-✅ Modelar datos en PostgreSQL
-✅ Arquitectura medallion (bronce-plata-oro)
-✅ Transformación y limpieza de datos
-✅ Versionado con Git
-✅ Análisis de datos para toma de decisiones
+- Levantar entorno Docker con múltiples servicios
+- Diseñar DAGs en Apache Airflow
+- Implementar ETL con Python y pandas
+- Modelar datos en PostgreSQL
+- Arquitectura medallion (bronce-plata-oro)
+- Transformación y limpieza de datos
+- Versionado con Git
+- Análisis de datos para toma de decisiones
 
-## 📝 Entregables
+## Entregables
 
-- ✅ Repositorio GitHub con código
-- ✅ DAG ejecutado exitosamente
-- ✅ Capturas de pgAdmin con datos
-- ✅ Documento de análisis (1-2 págs)
-- ✅ Mejoras propuestas para evolución
+- Repositorio GitHub con código
+- DAG ejecutado exitosamente
+- Capturas de pgAdmin con datos
+- Documento de análisis (1-2 págs)
+- Mejoras propuestas para evolución
 
-## 🎯 Criterios de Evaluación
+## Criterios de Evaluación
 
 | Rubro | % |
 |-------|-----|
@@ -277,7 +285,7 @@ ls -lh data/
 | Documentación | 10% |
 | Análisis e insights | 10% |
 
-## 🔗 Enlaces Útiles
+## Enlaces Útiles
 
 - [Apache Airflow Docs](https://airflow.apache.org/)
 - [PostgreSQL Docs](https://www.postgresql.org/docs/)
@@ -285,20 +293,23 @@ ls -lh data/
 - [Docker Documentation](https://docs.docker.com/)
 - [Medallion Architecture](https://www.databricks.com/blog/2022/06/24/onelake-medallion-lakehouse-architecture.html)
 
-## 📞 Soporte
+##  Soporte
 
 Para problemas o dudas:
-1. Consultar **PRACTICA_ETL_AIRFLOW.md** (sección Troubleshooting)
+1. Consultar **[PRACTICA_ETL_AIRFLOW.md](/PRACTICA_ETL_AIRFLOW.md)** (sección Troubleshooting)
 2. Revisar logs: `docker-compose logs -f`
-3. Contactar al instructor
+3. Contactar al profesor
 
-## 📄 Licencia
-
-Práctica educativa - Centro Educativo TSJ Zapopan
 
 ---
 
-**¡Éxito en tu práctica de Big Data! 🚀**
+**¡Éxito en tu proyecto de Big Data!**
 
+![Airflow](https://img.shields.io/badge/Apache%20Airflow-017CEE?style=for-the-badge&logo=apache-airflow&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![pgAdmin](https://img.shields.io/badge/pgAdmin-4D6DB3?style=for-the-badge&logo=postgresql&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
 
 
