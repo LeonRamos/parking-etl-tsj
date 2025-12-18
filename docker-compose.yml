@@ -1,248 +1,73 @@
-version: '3.8'
-
-# ============================================================
-# DOCKER COMPOSE - Pipeline ETL Estacionamiento TSJ Zapopan
-# Servicios: Airflow + PostgreSQL + pgAdmin
-# ============================================================
-
 services:
-  # ============================================================
-  # PostgreSQL: Base de datos principal
-  # ============================================================
-  postgres:
-    image: postgres:14-alpine
-    container_name: parking-postgres
-    hostname: postgres
-    environment:
-      POSTGRES_USER: airflow
-      POSTGRES_PASSWORD: airflow
-      POSTGRES_DB: parking_db
-      PGDATA: /var/lib/postgresql/data/pgdata
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./sql/init_database.sql:/docker-entrypoint-initdb.d/01-init.sql
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U airflow -d parking_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    networks:
-      - parking-network
-    restart: unless-stopped
-
-  # ============================================================
-  # pgAdmin: Interfaz web para PostgreSQL
-  # ============================================================
   pgadmin:
-    image: dpage/pgadmin4:7.5-alpine
+    image: dpage/pgadmin4:latest
     container_name: parking-pgadmin
-    hostname: pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@parking-tsj.local
       PGADMIN_DEFAULT_PASSWORD: admin123
-      PGADMIN_CONFIG_PROXY_X_FOR_COUNT: 1
-      PGADMIN_CONFIG_PROXY_X_PROTO_COUNT: 1
-      PGADMIN_CONFIG_PROXY_X_HOST_COUNT: 1
-      PGADMIN_CONFIG_PROXY_X_PORT_COUNT: 1
-      PGADMIN_CONFIG_PROXY_X_SCRIPT_NAME_COUNT: 1
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     ports:
       - "8081:80"
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - parking-network
     restart: unless-stopped
 
-  # ============================================================
-  # Airflow: Scheduler (orquestador de tareas)
-  # ============================================================
   airflow-scheduler:
     image: apache/airflow:2.7.1-python3.11
     container_name: parking-airflow-scheduler
-    hostname: airflow-scheduler
     environment:
-      # Core settings
-      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__PLUGINS_FOLDER: /opt/airflow/plugins
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
-      AIRFLOW__CORE__MAX_ACTIVE_RUNS_PER_DAG: 1
-      
-      # Database configuration (Airflow metadata DB)
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      # Conexión al servidor PostgreSQL 13 en el puerto 5433
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:postgres1989@host.docker.internal:5433/parking_db
       AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: "false"
-      
-      # Logging
-      AIRFLOW__LOGGING__BASE_LOG_FOLDER: /opt/airflow/logs
-      AIRFLOW__LOGGING__LOG_LEVEL: INFO
-      
-      # Scheduler settings
-      AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT: "false"
-      AIRFLOW__SCHEDULER__MIN_FILE_PROCESS_INTERVAL: 30
-      
-      # Email (deshabilitado para desarrollo local)
-      AIRFLOW__EMAIL__EMAIL_BACKEND: airflow.providers.smtp.executors.DebugEmailExecutor
-      
-      # Security
       AIRFLOW__WEBSERVER__SECRET_KEY: parking-etl-dev-key-123456789
-      
-      # WSGI settings
-      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
-    
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./scripts:/opt/airflow/scripts
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
-      - ./data:/opt/airflow/data
-    
-    depends_on:
-      postgres:
-        condition: service_healthy
-    
+      - ${PWD}/dags:/opt/airflow/dags
+      - ${PWD}/scripts:/opt/airflow/scripts
+      - ${PWD}/logs:/opt/airflow/logs
+      - ${PWD}/plugins:/opt/airflow/plugins
+      - ${PWD}/data:/opt/airflow/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - parking-network
-    
     restart: unless-stopped
-    
     command: scheduler
-    
-    # Health check
-    healthcheck:
-      test: ["CMD", "python", "-c", "from airflow.utils.state import DagRunState; print(DagRunState.RUNNING)"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
-  # ============================================================
-  # Airflow: Webserver (interfaz web)
-  # ============================================================
   airflow-webserver:
     image: apache/airflow:2.7.1-python3.11
     container_name: parking-airflow-webserver
-    hostname: airflow-webserver
     environment:
-      # Core settings
-      AIRFLOW__CORE__DAGS_FOLDER: /opt/airflow/dags
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__EXECUTOR: LocalExecutor
-      AIRFLOW__CORE__PLUGINS_FOLDER: /opt/airflow/plugins
-      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
-      
-      # Database configuration
-      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:postgres1989@host.docker.internal:5433/parking_db
       AIRFLOW__DATABASE__LOAD_DEFAULT_CONNECTIONS: "false"
-      
-      # Logging
-      AIRFLOW__LOGGING__BASE_LOG_FOLDER: /opt/airflow/logs
-      AIRFLOW__LOGGING__LOG_LEVEL: INFO
-      
-      # Webserver settings
-      AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
       AIRFLOW__WEBSERVER__SECRET_KEY: parking-etl-dev-key-123456789
-      AIRFLOW__WEBSERVER__WARN_DEPLOYMENT_EXPOSURE: "false"
-      
-      # User configuration
       AIRFLOW_WWW_USER_CREATE: "true"
-      AIRFLOW_WWW_USER_USERNAME: admin
-      AIRFLOW_WWW_USER_PASSWORD: admin123
-      AIRFLOW_WWW_USER_EMAIL: admin@parking-tsj.local
-      AIRFLOW_WWW_USER_FIRSTNAME: Admin
-      AIRFLOW_WWW_USER_LASTNAME: Parking
+      AIRFLOW_WWW_USER_USERNAME: airflow
+      AIRFLOW_WWW_USER_PASSWORD: airflow123
+      AIRFLOW_WWW_USER_EMAIL: airflow@parking-tsj.local
       AIRFLOW_WWW_USER_ROLE: Admin
-      
-      # Security
-      AIRFLOW__WEBSERVER__RBAC_ENABLED: "true"
-      
-      # Email
-      AIRFLOW__EMAIL__EMAIL_BACKEND: airflow.providers.smtp.executors.DebugEmailExecutor
-    
     volumes:
-      - ./dags:/opt/airflow/dags
-      - ./scripts:/opt/airflow/scripts
-      - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
-      - ./data:/opt/airflow/data
-    
+      - ${PWD}/dags:/opt/airflow/dags
+      - ${PWD}/scripts:/opt/airflow/scripts
+      - ${PWD}/logs:/opt/airflow/logs
+      - ${PWD}/plugins:/opt/airflow/plugins
+      - ${PWD}/data:/opt/airflow/data
     ports:
       - "8080:8080"
-    
-    depends_on:
-      postgres:
-        condition: service_healthy
-      airflow-scheduler:
-        condition: service_started
-    
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - parking-network
-    
     restart: unless-stopped
-    
     command: webserver
-    
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
-# ============================================================
-# VOLÚMENES
-# ============================================================
 volumes:
-  postgres_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/postgres_data
-  
   pgadmin_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ${PWD}/pgadmin_data
 
-# ============================================================
-# REDES
-# ============================================================
 networks:
   parking-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.28.0.0/16
-
-# ============================================================
-# NOTAS:
-# ============================================================
-# 1. Los volúmenes requieren que existan los directorios:
-#    mkdir -p postgres_data pgadmin_data logs
-#
-# 2. Tiempos de inicio:
-#    - PostgreSQL: 5-10 segundos
-#    - Airflow: 30-60 segundos
-#    - pgAdmin: 10-20 segundos
-#
-# 3. Para re-inicializar por completo:
-#    docker-compose down -v
-#    rm -rf postgres_data pgadmin_data logs
-#    docker-compose up -d
-#
-# 4. Para ver logs en tiempo real:
-#    docker-compose logs -f [servicio]
-#
-# 5. Acceso a servicios:
-#    - Airflow: http://localhost:8080 (admin/admin123)
-#    - pgAdmin: http://localhost:8081 (admin@parking-tsj.local/admin123)
-#    - PostgreSQL: localhost:5432 (airflow/airflow)
